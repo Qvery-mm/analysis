@@ -8,57 +8,129 @@ class VoronovCell:
         self.maxBorderDist = 2**(1/2)
         self.minBorderDist = 1
 
-    def updateCell(self, point):
+
+    def __getIntersections(self, point):
         center = Point2D(0, 0)
         line = Line2D(center, point)
         midpoint = Point2D(point.x / 2, point.y / 2)
-        perpendicular = line.perpendicular_line(midpoint)
+        self.perpendicular = line.perpendicular_line(midpoint)
 
-        intersections = []
-
+        sectionIntersections = []
+        vertexIntersections = []
         for i in range(self.sizeOfShell - 1):
             section = Segment2D(self.shell[i], self.shell[i+1])
-            if perpendicular.intersection(section):
-                intersections.append((i, perpendicular.intersection(section)))
+            intersection = self.perpendicular.intersection(section)
+            if intersection:
+                sectionIntersections.append((i, self.perpendicular.intersection(section))) #add number of previous vertex and intersection point
+                if self.shell[i] in self.perpendicular:
+                    vertexIntersections.append(i)
 
-        section = Segment2D(self.shell[0], self.shell[self.sizeOfShell - 1])
-        if perpendicular.intersection(section):
-            intersections.append((self.sizeOfShell - 1, perpendicular.intersection(section)))
-        print(intersections)
+        section = Segment2D(self.shell[0], self.shell[self.sizeOfShell-1])
+        intersection = self.perpendicular.intersection(section)
+        if intersection:
+            sectionIntersections.append((self.sizeOfShell-1, self.perpendicular.intersection(section)))  # add number of previous vertex and intersection point
+        if self.shell[self.sizeOfShell - 1] in self.perpendicular:
+            vertexIntersections.append(self.sizeOfShell - 1)
+        #print(sectionIntersections)
+        #print(vertexIntersections)
+        self.__sections = sectionIntersections
+        self.__vertex = vertexIntersections
 
-        for i in intersections: #если перпендикуляр пересекается с границей ячейки по отрезку
-            if (str(type(i[1][0])) == "<class 'sympy.geometry.line.Segment2D'>"):
+
+    def updateCell(self, point):
+        self.__getIntersections(point)
+        if not self.__sections:
+            print("No intersections")
+            return
+
+        for i in self.__sections:
+            if str(type(i[1][0])) == "<class 'sympy.geometry.line.Segment2D'>":
+                print("Segment intersection")
                 return
 
+        shell1 = []
+        shell2 = []
+        # найдено 2 вершины
+        if len(self.__vertex) == 2:
+            for i in range(self.__vertex[0], self.__vertex[1] + 1):
+                shell1.append(self.shell[i])
 
-        if intersections: #если серединный перпендикуляр пересекает ранее построенную ячейку:
-            nextPoint = self.shell[intersections[0][0]+1]
-            testSegment = Segment2D(point, nextPoint)
-            newShell = []
-            if perpendicular.intersection(testSegment): #если новая точка и узел ячейки лежат по разные стороны от перпендикуляра:
-                print("???")
-                pygame.draw.circle(screen, black, (point.x * 200 + 500, point.y * 200 + 500), 5, 1)
-                newShell.append(intersections[0][1][0])
-                for i in range(intersections[0][0]+1, intersections[1][0] + 1):
-                    if(self.shell[i] != intersections[0][1][0] and self.shell[i] != intersections[1][1][0]):
-                        newShell.append(self.shell[i])
-                newShell.append(intersections[1][1][0])
-            # если новая точка и узел ячейки лежат по одну сторону от перпендикуляра:
+            for i in range(self.__vertex[1], self.sizeOfShell):
+                shell2.append(self.shell[i])
+            for i in range(0, self.__vertex[0] + 1):
+                shell2.append(self.shell[i])
+
+
+        #найдена 1 вершина
+        if len(self.__vertex) == 1:
+            vertex = self.__vertex[0]
+            section = -1
+            for i in self.__sections:
+                if self.shell[vertex] != i[1][0]:
+                    section = i
+            if section == -1:
+                return
+            print("debug", vertex)
+            print("debug", section)
+
+            if vertex < section[0]:
+                for i in range(vertex, section[0]+1):
+                    shell1.append(self.shell[i])
+                shell1.append(section[1][0])
+
+                shell2.append(section[1][0])
+                for i in range(section[0]+1, self.sizeOfShell):
+                    shell2.append(self.shell[i])
+                for i in range(vertex + 1):
+                    shell2.append(self.shell[i])
             else:
-                print("!!!")
+                shell1.append(section[1][0])
+                for i in range(section[0] + 1, vertex + 1):
+                    shell1.append(self.shell[i])
 
-                pygame.draw.circle(screen, black, (point.x * 200 + 500, point.y*200 + 500), 5, 1)
-                newShell = []
-                for i in range(intersections[0][0]+1):
-                    if (self.shell[i] != intersections[0][1][0] and self.shell[i] != intersections[1][1][0]):
-                        newShell.append(self.shell[i])
-                newShell.append(intersections[0][1][0])
-                newShell.append(intersections[1][1][0])
-                for i in range(intersections[1][0]+1, self.sizeOfShell):
-                    if (self.shell[i] != intersections[0][1][0] and self.shell[i] != intersections[1][1][0]):
-                        newShell.append(self.shell[i])
-            self.shell = newShell
 
+                for i in range(vertex, self.sizeOfShell):
+                    shell2.append(self.shell[i])
+                for i in range(section[0] + 1):
+                    shell2.append(self.shell[i])
+                shell2.append(section[1][0])
+
+            print("debug", shell1)
+            print("debug", shell2)
+
+
+        #найдено 0 вершин
+        if len(self.__vertex) == 0:
+            firstV, lastV = self.__sections[0][0], self.__sections[1][0]
+            firstP, lastP = self.__sections[0][1][0], self.__sections[1][1][0]
+            shell1.append(firstP)
+
+            for i in range(firstV+1, lastV + 1):
+                shell1.append(self.shell[i])
+            shell1.append(lastP)
+
+            shell2.append(lastP)
+            for i in range(lastV + 1, self.sizeOfShell):
+                shell2.append(self.shell[i])
+            for i in range(firstV + 1):
+                shell2.append(self.shell[i])
+            shell2.append(firstP)
+
+        # print(shell1)
+        # print(shell2)
+        #выбираем нужную оболочку
+        for i in shell1:
+            #print("t", i)
+            if i not in self.perpendicular:
+                testSection = Segment2D(point, i)
+                if testSection.intersection(self.perpendicular):
+                    self.shell = shell1.copy()
+                    self.sizeOfShell = len(shell1)
+                    return
+        self.shell = shell2.copy()
+        self.sizeOfShell = len(shell2)
+
+        #print(self.shell)
 
 
 import sys, pygame
@@ -75,14 +147,15 @@ screen.fill(white)
 pygame.draw.line(screen, black, (500, 0), (500, 1000), 1)
 pygame.draw.line(screen, black, (0, 500), (1000, 500), 1)
 
+x = 0.618
+h = 0.2
 cell = VoronovCell()
-point1 = Point2D(-1, 1)
-point2 = Point2D(1, 1)
-point3 = Point2D(0, -2)
+for i in range(-5, 5 + 1):
+    for j in range(-5, 5 + 1):
+        if(i != 0 and  j != 0):
+            point = Point2D(i *x*j, j*h)
+            cell.updateCell(point)
 
-cell.updateCell(point1)
-cell.updateCell(point2)
-cell.updateCell(point3)
 
 shape = cell.shell.copy()
 for i in range(len(shape)):
