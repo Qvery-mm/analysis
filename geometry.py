@@ -46,7 +46,7 @@ class VoronovCell:
 
         for i in self.__sections:
             if str(type(i[1][0])) == "<class 'sympy.geometry.line.Segment2D'>":
-                print("Segment intersection")
+                #print("Segment intersection")
                 return
 
         shell1 = []
@@ -71,8 +71,8 @@ class VoronovCell:
                     section = i
             if section == -1:
                 return
-            print("debug", vertex)
-            print("debug", section)
+            #print("debug", vertex)
+            #print("debug", section)
 
             if vertex < section[0]:
                 for i in range(vertex, section[0]+1):
@@ -96,8 +96,8 @@ class VoronovCell:
                     shell2.append(self.shell[i])
                 shell2.append(section[1][0])
 
-            print("debug", shell1)
-            print("debug", shell2)
+            #print("debug", shell1)
+            #print("debug", shell2)
 
 
         #найдено 0 вершин
@@ -142,94 +142,8 @@ class VoronovCell:
 def distToZero(a, b):
     return (a*a + b*b)**(1/2)
 
-def insertText(screen, x, n, AV):
-    textsurface = myfont.render(' x = ' + str(x), False, (0, 0, 0))
-    screen.blit(textsurface, (width, 50))
-
-    textsurface = myfont.render(' h = ' + str(H) + '/' + str(n), False, (0, 0, 0))
-    screen.blit(textsurface, (width, 150))
-
-
-    textsurface = myfont.render(' A(V) = ' + str(format(AV, '.10g')), False, (0, 0, 0))
-    screen.blit(textsurface, (width, 250))
-
-import sys, pygame
-pygame.init()
-
-width, height = 1000, 1000
-size = width + 300, height
-black = 0, 0, 0
-gray = 127, 127, 127
-white = 255, 255, 255
-
-screen = pygame.display.set_mode(size)
 
 
 
-
-#x = 0.61803398875
-#x = 3.1415926
-#x = 1.4331274267223
-x = 2**(1/2)
-#x = 1/3
-H, h = 1, 1
-STEP = 500
-
-cell = VoronovCell()
-A = []
-for i in range(-1000, 1000 + 1):
-    for j in range(-1000, 1000 + 1):
-        a, b = i + x * j, j
-        r = distToZero(a, b)
-        if abs(a) <= 2:
-            A.append([r, a, b, 0])
-A.sort()
-
-for n in range(1, 50, 1):
-    step = STEP * (n**(1/2)) / 3
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT: sys.exit()
-
-    screen.fill(white)
-    pygame.draw.line(screen, black, (500, 0), (500, 1000), 1)
-    pygame.draw.line(screen, black, (0, 500), (1000, 500), 1)
-    pygame.font.init()
-    myfont = pygame.font.SysFont('Arial', 30)
-
-    h = H / n
-
-    for i in A:
-        if abs(i[1])*step > width / 2:
-            A.remove(i)
-
-    for i in range(len(A)):
-        #print(A[i])
-        A[i][3] = A[i][2] * h
-        A[i][0] = distToZero(A[i][1], A[i][3])
-    A.sort()
-
-    for i in A:
-        if(abs(i[1] * step) <= width / 2 and abs(i[3] * step) < height / 2):
-            pygame.draw.circle(screen, black, (int(i[1] * step + width / 2), height - int(i[3] * step + height / 2)), 1)
-        if i[0] <= 2 * cell.maxBorderDist:
-            if(i[1] != 0 or i[3] != 0):
-                point = Point2D(i[1], i[3])
-                cell.updateCell(point)
-        #else:
-            #break
-
-
-
-
-    AV = cell.maxBorderDist / cell.minBorderDist
-    shape = cell.shell.copy()
-    for i in range(len(shape)):
-        shape[i] = (shape[i].x * step + 500, height - (shape[i].y * step + 500))
-    pygame.draw.polygon(screen, black, shape, 1)
-
-    pygame.draw.rect(screen, gray, ((width, 0),(width + 200, height)), 0)
-    insertText(screen, x, n, AV)
-    pygame.display.flip()
-    #pygame.image.save(screen, "./sqrt(2)/screenshot" + str(n) + ".jpeg")
 
 
