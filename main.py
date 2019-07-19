@@ -2,6 +2,8 @@ import sys
 import pygame
 import geometry
 import sympy
+from math import log, sin
+import datetime
 
 
 def insertText(screen, font, x, n, AV):
@@ -29,21 +31,22 @@ white = 255, 255, 255
 #x = pi #main number
 
 H, h = 1, 1
-N = 200
+N = 1000
 STEP = 500
 
 
 def processNumber(x, name):
-    sys.stdout = open("./16jul/" + name + "/"+ name + " A(n).txt", "w")
+    sys.stdout = open("./19jul/" + name + "/"+ name + " A(n).txt", "w")
     A = []
-    for i in range(-1000, 1000 + 1):
-        for j in range(-1000, 1000 + 1):
+    for i in range(-4000, 4000 + 1):
+        for j in range(-4000, 4000 + 1):
             a, b = i + x * j, j
             r = geometry.distToZero(a, b)
             if abs(a) <= 2:
                 A.append([r, a, b, 0])
     A.sort()
-    for n in range(1, N + 1, 1):
+    for t in range(1, N + 1, 1):
+        n = t * t
         cell = geometry.VoronovCell()
         step = STEP * (n**(1/2)) / 3
         for event in pygame.event.get():
@@ -88,36 +91,42 @@ def processNumber(x, name):
 
         pygame.draw.rect(screen, gray, ((width, 0),(width + 200, height)), 0)
         insertText(screen, myfont, x, n, AV)
-        pygame.display.flip()
+         pygame.display.flip()
         print(n, AV)
-        pygame.image.save(screen, "./16jul/" + name + "/screenshot" + str(n) + ".jpeg")
+        pygame.image.save(screen, "./19jul/" + name + "/screenshot" + str(n) + ".jpeg")
     sys.stdout.close()
 
 
 garmonic = 1.4331274267223 #[1; 2, 3, 4, 5, 6, 7, ...]
 rationale = 1/3
 cubic2 = 2 ** (1/3)
+cubic3 = 3 ** (1/3)
 e = 2.71828182846
 phi = 0.61803398875 #golden ratio
-pi = 3.14159265359
+pi = 3.14159265358979323
 sqrt2 = 2**(1/2)
 sqrt3 = 3 ** (1/2)
 sqrt5 = 5 ** (1/2)
-
+ln_pi = log(pi)
+sin1 = sin(1)
 
 
 pygame.init()
 screen = pygame.display.set_mode(size)
+print("start")
 
-processNumber(garmonic, "[1; 2, 3, 4, ...]")
-processNumber(rationale, "0.(3)")
-processNumber(cubic2, "cubic root(2)")
-processNumber(e, "e")
-processNumber(phi, "phi")
-processNumber(1/phi, "phi^-1")
-processNumber(pi, "pi")
-processNumber(sqrt2, "sqrt(2)")
-processNumber(sqrt3, "sqrt(3)")
-processNumber(sqrt5, "sqrt(5)")
+# processNumber(garmonic, "[1; 2, 3, 4, ...]")
+# #processNumber(rationale, "0.(3)")
+# processNumber(cubic2, "cubic root(2)")
+# processNumber(cubic3, "cubic root(3)")
+# processNumber(e, "e")
+# processNumber(phi, "phi")
+
+# processNumber(pi, "pi")
+# processNumber(sqrt2, "sqrt(2)")
+# processNumber(sqrt3, "sqrt(3)")
+# processNumber(sqrt5, "sqrt(5)")
+# processNumber(ln_pi, "ln(pi)")
+processNumber(sin1, "sin(1)")
 
 
