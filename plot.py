@@ -7,10 +7,11 @@ from time import sleep
 
 
 def make_plot(name):
-    sys.stdin = open("./18jul/" + name + "/" + name +  " A(n).txt", "r")
+    day = "23jul"
+    sys.stdin = open("./%s/%s/%s A(n).txt" % (day, name, name), "r")
     x = []
     y = []
-    for i in range(200):
+    for i in range(1000):
         s = input()
         s = s.split()
         x.append(int(s[0]))
@@ -22,21 +23,24 @@ def make_plot(name):
     ax.plot(x, y)
 
     ax.set(xlabel='n', ylabel='A(n)',
-           title='x = ' + name  + ';  t = 1/n')
+           title='x = ' + name  + ';  t = 1/n^2')
     ax.grid()
 
-    fig.savefig("./18jul/" + name + "/plot.png")
+    fig.savefig("./%s/%s/plot.png" % (day, name))
     #plt.show()
     #sleep(2)
     sys.stdin.close()
 
-make_plot("0.(3)")
-make_plot("[1; 2, 3, 4, ...]")
-make_plot("cubic root(2)")
-make_plot("e")
-make_plot("phi")
-make_plot("phi^-1")
-make_plot("pi")
-make_plot("sqrt(2)")
-make_plot("sqrt(3)")
-make_plot("sqrt(5)")
+make_plot("p1")
+make_plot("p2")
+make_plot("p3")
+make_plot("p4")
+make_plot("p5")
+
+make_plot("p7")
+make_plot("p8")
+make_plot("p9")
+make_plot("p10")
+
+
+

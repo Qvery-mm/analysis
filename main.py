@@ -33,10 +33,11 @@ white = 255, 255, 255
 H, h = 1, 1
 N = 1000
 STEP = 500
-
+day = "23jul"
 
 def processNumber(x, name):
-    sys.stdout = open("./19jul/" + name + "/"+ name + " A(n).txt", "w")
+    sys.stdout = open("./%s/%s/%s A(n).txt" % (day, name, name), "w")
+    #sys.stdout = open("./23jul/" + name + "/"+ name + " A(n).txt", "w")
     A = []
     for i in range(-4000, 4000 + 1):
         for j in range(-4000, 4000 + 1):
@@ -91,9 +92,9 @@ def processNumber(x, name):
 
         pygame.draw.rect(screen, gray, ((width, 0),(width + 200, height)), 0)
         insertText(screen, myfont, x, n, AV)
-         pygame.display.flip()
+        pygame.display.flip()
         print(n, AV)
-        pygame.image.save(screen, "./19jul/" + name + "/screenshot" + str(n) + ".jpeg")
+        pygame.image.save(screen, "./%s/%s/screenshot%d.jpeg" % (day, name, n))
     sys.stdout.close()
 
 
@@ -111,22 +112,34 @@ ln_pi = log(pi)
 sin1 = sin(1)
 
 
+#Small Pisot numbers
+p1 = 1.3247179572447460260
+p2 = 1.3802775690976141157
+p3 = 1.4432687912703731076
+p4 = 1.4655712318767680267
+p5 = 1.5015948035390873664
+p6 = 1.5341577449142669154
+p7 = 1.5452156497327552432
+p8 = 1.5617520677202972947
+p9 = 1.5701473121960543629
+p10 = 1.5736789683935169887
+
+
 pygame.init()
 screen = pygame.display.set_mode(size)
 print("start")
 
-# processNumber(garmonic, "[1; 2, 3, 4, ...]")
-# #processNumber(rationale, "0.(3)")
-# processNumber(cubic2, "cubic root(2)")
-# processNumber(cubic3, "cubic root(3)")
-# processNumber(e, "e")
-# processNumber(phi, "phi")
+# processNumber(p1, "p1")
+# processNumber(p2, "p2")
+# processNumber(p3, "p3")
+# processNumber(p4, "p4")
+# processNumber(p5, "p5")
+# processNumber(p6, "p6")
+processNumber(p7, "p7")
+processNumber(p8, "p8")
+processNumber(p9, "p9")
+processNumber(p10, "p10")
 
-# processNumber(pi, "pi")
-# processNumber(sqrt2, "sqrt(2)")
-# processNumber(sqrt3, "sqrt(3)")
-# processNumber(sqrt5, "sqrt(5)")
-# processNumber(ln_pi, "ln(pi)")
-processNumber(sin1, "sin(1)")
+
 
 
